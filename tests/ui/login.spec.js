@@ -1,65 +1,54 @@
-const { expect, test, chromium, firefox, webkit } = require('@playwright/test');
-const LoginPage = require('../../src/pages/LoginPage');
-const DashboardPage = require('../../src/pages/DashboardPage');
+const { expect } = require('@playwright/test');
+const test = require('../fixtures/testFixtures');
 const config = require('../../src/utils/config');
-
-const browserTypes = { chromium, firefox, webkit };
 
 test.describe.serial('OrangeHRM Login Tests - Sequential in One Browser', () => {
 
-  let browser;
   let page;
   let loginPage;
   let dashboardPage;
 
-  test.beforeAll(async () => {
-    const browserType = browserTypes[config.browser] || chromium;
-    const launchOptions = { headless: config.headless, slowMo: config.slowMo };
-    if (config.browserChannel) launchOptions.channel = config.browserChannel;
-    browser = await browserType.launch(launchOptions);
+  test.beforeAll(async ({ browser, loginPageFixture, dashboardPageFixture }) => {
     page = await browser.newPage();
-    loginPage = new LoginPage(page);
-    dashboardPage = new DashboardPage(page);
-
+    loginPage = loginPageFixture(page);
+    dashboardPage = dashboardPageFixture(page);
     await loginPage.navigateTo();
-    console.log(`Browser opened (${config.browser}) and navigated to login page`);
   });
 
   test.afterAll(async () => {
-    await browser.close();
-  }, 60000);
-
-  // TC01: Verify Login Page Loaded
-  test('TC01: Navigate to OrangeHRM Login Page', async () => {
-    const currentUrl = page.url();
-    expect(currentUrl).toContain('orangehrmlive.com');
-    console.log('TC01: Navigated to login page');
+    await page.close();
   });
 
-  // TC02: Successful Login
-  test('TC02: Login with Valid Credentials', async () => {
+  // TC01: Verify Login Page is Loaded
+  test('TC01: Navigate to OrangeHRM Login Page', async () => {
+    expect(page.url()).toContain('orangehrmlive.com');
+  });
+
+  // TC02: Invalid Credentials Shows Error
+  test('TC02: Login with Invalid Credentials Shows Error', async () => {
+    await loginPage.login('invalid_user', 'invalid_pass');
+
+    expect(await loginPage.isErrorDisplayed()).toBeTruthy();
+    expect(await loginPage.getErrorMessage()).toContain('Invalid credentials');
+  });
+
+  // TC03: Successful Login
+  test('TC03: Login with Valid Credentials', async () => {
     await loginPage.login(config.credentials.username, config.credentials.password);
 
-    const isDashboardLoaded = await dashboardPage.isDashboardDisplayed();
-    expect(isDashboardLoaded).toBeTruthy();
-
-    const isDashboardUrl = await dashboardPage.isDashboardUrl();
-    expect(isDashboardUrl).toBeTruthy();
-
-    console.log('TC02: Login successful - Dashboard loaded');
+    expect(await dashboardPage.isDashboardDisplayed()).toBeTruthy();
+    expect(await dashboardPage.isDashboardUrl()).toBeTruthy();
   });
 
-  // TC03: Verify Dashboard Elements
-  test('TC03: Verify Dashboard is Fully Loaded', async () => {
-    const isDashboardLoaded = await dashboardPage.isDashboardDisplayed();
-    expect(isDashboardLoaded).toBeTruthy();
-    console.log('TC03: Dashboard elements verified');
+  // TC04: Verify Dashboard is Still Loaded
+  test('TC04: Verify Dashboard is Fully Loaded', async () => {
+    expect(await dashboardPage.isDashboardDisplayed()).toBeTruthy();
   });
 
-  // TC04: Logout
-  test('TC04: Logout from Dashboard', async () => {
+  // TC05: Logout
+  test('TC05: Logout from Dashboard', async () => {
     await dashboardPage.logout();
-    console.log('TC04: Logged out successfully');
+    expect(page.url()).toContain('login');
   });
 
 });
