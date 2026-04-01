@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "checkJs": false,
+    "module": "CommonJS",
+    "target": "ES2022",
+    "baseUrl": ".",
+    "paths": {
+      "@pages/*": ["src/pages/*"],
+      "@fixtures/*": ["tests/fixtures/*"],
+      "@utils/*": ["src/utils/*"]
+    }
+  },
+  "include": [
+    "src/**/*.js",
+    "tests/**/*.js",
+    "playwright.config.js"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

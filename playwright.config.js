@@ -11,8 +11,8 @@ module.exports = defineConfig({
   },
 
   retries: process.env.CI ? 2 : 0,
-  workers: 1,
-  fullyParallel: false,
+  workers: process.env.CI ? 4 : 2,  // 2 workers locally, 4 in CI
+  fullyParallel: true,               // spec files run in parallel
 
   reporter: [
     ['html', { outputFolder: 'reports/html' }],

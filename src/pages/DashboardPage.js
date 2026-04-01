@@ -4,51 +4,41 @@ class DashboardPage extends BasePage {
 
     constructor(page) {
         super(page);
+
+        // Header
+        this.logo             = page.locator('.oxd-brand-banner');
+        this.userDropdown     = page.locator('.oxd-userdropdown-tab');
+        this.logoutButton     = page.locator('a:has-text("Logout")');
+
+        // Dashboard heading
+        this.dashboardHeading = page.locator('h6:has-text("Dashboard")');
+
+        // Widget headings
+        this.widgetTimeAtWork      = page.locator('p', { hasText: 'Time at Work' });
+        this.widgetMyActions       = page.locator('p', { hasText: 'My Actions' });
+        this.widgetQuickLaunch     = page.locator('p', { hasText: 'Quick Launch' });
+        this.widgetBuzzLatestPosts = page.locator('p', { hasText: 'Buzz Latest Posts' });
+        this.widgetEmployeesByUnit = page.locator('p', { hasText: 'Employee Distribution by Sub Unit' });
+        this.widgetEmployeesByLoc  = page.locator('p', { hasText: 'Employee Distribution by Location' });
     }
 
-    dashboardHeading = 'h6:has-text("Dashboard")';
-    userDropdown = '.oxd-userdropdown-tab';
-    logoutButton = 'a:has-text("Logout")';
-
-    // Verify dashboard heading is visible using modern locator API
     async isDashboardDisplayed() {
-        try {
-            console.log('⏳ Waiting for dashboard heading...');
-            await this.page.locator(this.dashboardHeading).waitFor({ state: 'visible', timeout: 10000 });
-            const isVisible = await this.page.locator(this.dashboardHeading).isVisible();
-            console.log('Dashboard heading is visible');
-            return isVisible;
-        } catch (error) {
-            console.error('Dashboard failed to load:', error.message);
-            return false;
-        }
+        return await this.isLocatorVisible(this.dashboardHeading);
     }
 
-    // Verify page URL is dashboard
     async isDashboardUrl() {
-        const url = this.page.url();
-        console.log(`Current URL: ${url}`);
-        return url.includes('dashboard');
+        return this.page.url().includes('dashboard');
     }
 
-    // Logout using modern locator API
+    async isLogoDisplayed() {
+        return await this.logo.isVisible();
+    }
+
     async logout() {
-        try {
-            console.log('Clicking user dropdown...');
-            await this.page.locator(this.userDropdown).click();
-
-            console.log('Clicking logout button...');
-            await this.page.locator(this.logoutButton).waitFor({ state: 'visible' });
-            await this.page.locator(this.logoutButton).click();
-
-            console.log('Waiting for navigation...');
-            await this.page.waitForLoadState('networkidle');
-
-            console.log('Logout completed');
-        } catch (error) {
-            console.error('Logout failed:', error.message);
-            throw error;
-        }
+        await this.userDropdown.click();
+        await this.logoutButton.waitFor({ state: 'visible' });
+        await this.logoutButton.click();
+        await this.page.waitForLoadState('networkidle');
     }
 }
 

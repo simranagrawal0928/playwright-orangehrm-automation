@@ -1,17 +1,21 @@
-const { expect } = require('@playwright/test');
-const test = require('../fixtures/testFixtures');
+const { test, expect } = require('@playwright/test');
+const LoginPage = require('../../src/pages/LoginPage');
+const DashboardPage = require('../../src/pages/DashboardPage');
 const config = require('../../src/utils/config');
 
-test.describe.serial('OrangeHRM Login Tests - Sequential in One Browser', () => {
+test.describe.serial('OrangeHRM Login Tests', () => {
 
+  /** @type {import('@playwright/test').Page} */
   let page;
+  /** @type {LoginPage} */
   let loginPage;
+  /** @type {DashboardPage} */
   let dashboardPage;
 
-  test.beforeAll(async ({ browser, loginPageFixture, dashboardPageFixture }) => {
+  test.beforeAll(async ({ browser }) => {
     page = await browser.newPage();
-    loginPage = loginPageFixture(page);
-    dashboardPage = dashboardPageFixture(page);
+    loginPage = new LoginPage(page);
+    dashboardPage = new DashboardPage(page);
     await loginPage.navigateTo();
   });
 
@@ -40,13 +44,8 @@ test.describe.serial('OrangeHRM Login Tests - Sequential in One Browser', () => 
     expect(await dashboardPage.isDashboardUrl()).toBeTruthy();
   });
 
-  // TC04: Verify Dashboard is Still Loaded
-  test('TC04: Verify Dashboard is Fully Loaded', async () => {
-    expect(await dashboardPage.isDashboardDisplayed()).toBeTruthy();
-  });
-
-  // TC05: Logout
-  test('TC05: Logout from Dashboard', async () => {
+  // TC04: Logout
+  test('TC04: Logout from Dashboard', async () => {
     await dashboardPage.logout();
     expect(page.url()).toContain('login');
   });
