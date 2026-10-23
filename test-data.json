@@ -1,0 +1,11 @@
+{
+  "employees": [
+    { "firstName": "Aarav", "lastName": "Sharma", "middleName": "Raj" },
+    { "firstName": "Meera", "lastName": "Nair", "middleName": "K" },
+    { "firstName": "Liam", "lastName": "Connor", "middleName": "James" }
+  ],
+  "invalidLogins": [
+    { "password": "wrongpass123", "scenario": "wrong password", "username": "Admin" },
+    { "password": "admin123", "scenario": "unknown username", "username": "not.a.real.user" }
+  ]
+}

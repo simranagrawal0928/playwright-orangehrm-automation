@@ -1,29 +1,8 @@
-cat > .gitignore << 'EOF'
-# Environment
-.env
-.env.local
-.env*.local
-
-# Dependencies
 node_modules/
-
-# Test artifacts
-reports/
 test-results/
 playwright-report/
 blob-report/
-
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
-*~
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Logs
+playwright/.auth/
+.env
 *.log
-EOF
+.DS_Store
